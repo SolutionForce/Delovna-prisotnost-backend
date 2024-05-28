@@ -28,26 +28,16 @@ router.get("/users", async (req, res) => {
 
 });
 
-// Post users to db
+// post users to db
 router.post("/users", async (req, res) => {
   logger.info(req.method + " " + req.originalUrl);
   logger.info("POST /users");
   try {
     const user = req.body;
-    if (!user.uid || !user.name || !user.surname || !Array.isArray(user.attendance)) {
-      return res.status(400).send("Invalid user data");
-    }
-    const newUser = {
-      uid: user.uid,
-      name: user.name,
-      surname: user.surname,
-      attendance: user.attendance
-    };
-    await db.collection('users').doc(newUser.uid).set(newUser);
+    await db.collection('users').doc(user.id).set(user);
     res.status(201).send("User created");
   } catch (error) {
     res.status(500).send(error.toString());
-    logger.info("Error creating user:", error);
   }
 });
 
