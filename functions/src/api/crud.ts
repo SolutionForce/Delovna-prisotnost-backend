@@ -1,14 +1,7 @@
-const express = require("express");
+import express from "express";
+import { logger } from "firebase-functions";
+import { db } from "../config/firestoreConfig";
 const router = express.Router();
-const admin = require('firebase-admin');
-const { logger } = require("firebase-functions");
-
-if (!admin.apps.length) {
-  console.log("console logging from crud.js")
-  admin.initializeApp();
-}
-const db = admin.firestore();
-
 
 router.get("/test1", (req, res) => {
   res.send("Hello World!");
@@ -23,9 +16,8 @@ router.get("/users", async (req, res) => {
       res.status(200).json(data);
     } 
     catch (error) {
-    res.status(500).send(error.toString());
+    res.status(500).send(error);
   }
-
 });
 
 router.post("/users", async (req, res) => {
@@ -45,7 +37,7 @@ router.post("/users", async (req, res) => {
     await db.collection('users').doc(newUser.uid).set(newUser);
     res.status(201).send("User created");
   } catch (error) {
-    res.status(500).send(error.toString());
+    res.status(500).send(error);
     logger.info("Error creating user:", error);
   }
 });
@@ -61,12 +53,10 @@ router.get("/users/:uid", async (req, res) => {
     }
     res.status(200).json(user.data());
   } catch (error) {
-    res.status(500).send(error.toString());
+    res.status(500).send(error);
     logger.info("Error getting user:", error);
   }
-
-
-
 });
+
 
 module.exports = router;
