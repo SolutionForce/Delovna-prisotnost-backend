@@ -12,10 +12,11 @@ export const onNewUserSignUp = functions.auth.user().onCreate(async (user) => {
       name: (user.displayName ?? 'Name not set'),
       surname: '',
       email: (user.email ?? 'Email not set'),
-      organizationId: undefined,
+      organizationId: '',
       role: Role.guest,
       createdAt: timeNow,
-      attendance: []
+      attendance: [],
+      hourlyRate: 0
     }
     
     await db.collection('users').doc(user.uid).set(newUser);

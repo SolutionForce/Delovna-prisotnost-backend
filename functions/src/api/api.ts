@@ -7,9 +7,15 @@ const cors = require('cors');
 const app = express();
 
 app.use(express.json());
-app.use(cors()); //Zacasno omogocimo CORS v lokalnem okolju
+app.use(cors({origin: true, credentials: true})); //Zacasno omogocimo CORS v lokalnem okolju
 
+//Import
 const crud = require("./crud"); 
+const codeAuthentication  = require("./routes/codeAuthentication "); 
+
+//Use
 app.use("/", crud);
+app.use("/codeAuthentication", codeAuthentication);
+
 
 export { app };

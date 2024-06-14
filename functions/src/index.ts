@@ -1,4 +1,3 @@
-import admin from 'firebase-admin';
 import { onNewUserSignUp } from "./triggers/onNewUserSignUp";
 import { app } from './api/api';
 

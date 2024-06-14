@@ -10,7 +10,7 @@ router.get("/test1", (req, res) => {
 router.get("/users", async (req, res) => {
   logger.info(req.method + " " + req.originalUrl);
   logger.info("GET /users");
-    try{
+  try {
       const snapshot = await db.collection('users').get();
       const data = snapshot.docs.map(doc => doc.data());;
       res.status(200).json(data);

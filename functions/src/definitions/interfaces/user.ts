@@ -24,6 +24,8 @@ export interface User {
     surname: string;
     email: string;
     createdAt: Timestamp;
+    organizationId: string;
     role: Role;
     attendance: Attendance[];
+    hourlyRate: number;
 }
