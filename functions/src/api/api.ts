@@ -12,4 +12,8 @@ app.use(cors()); //Zacasno omogocimo CORS v lokalnem okolju
 const crud = require("./crud"); 
 app.use("/", crud);
 
+const timetable = require("./timetable"); 
+app.use("/", timetable);
+
+
 export { app };

@@ -1,23 +1,18 @@
 import express from "express";
 import { logger } from "firebase-functions";
 import { db } from "../config/firestoreConfig";
+import {getUsers} from "../common/users";
+import { get } from "http";
 const router = express.Router();
-
-router.get("/test1", (req, res) => {
-  res.send("Hello World!");
-});
 
 router.get("/users", async (req, res) => {
   logger.info(req.method + " " + req.originalUrl);
   logger.info("GET /users");
-    try{
-      const snapshot = await db.collection('users').get();
-      const data = snapshot.docs.map(doc => doc.data());;
-      res.status(200).json(data);
-    } 
-    catch (error) {
-    res.status(500).send(error);
+  getUsers().then((response) => {
+    console.log(response);
+    res.status(response.status).json(response.data);
   }
+  );
 });
 
 router.post("/users", async (req, res) => {
