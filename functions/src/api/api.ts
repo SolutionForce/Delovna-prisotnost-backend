@@ -9,11 +9,11 @@ const app = express();
 app.use(express.json());
 app.use(cors({origin: true, credentials: true})); //Zacasno omogocimo CORS v lokalnem okolju
 
-//Import
+//Import your files
 const crud = require("./crud"); 
 const codeAuthentication  = require("./routes/codeAuthentication "); 
 
-//Use
+//Add to url your files
 app.use("/", crud);
 app.use("/codeAuthentication", codeAuthentication);
 

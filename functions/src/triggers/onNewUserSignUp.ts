@@ -21,6 +21,6 @@ export const onNewUserSignUp = functions.auth.user().onCreate(async (user) => {
     
     await db.collection('users').doc(user.uid).set(newUser);
   } catch (error) {
-    console.error(error);
+    functions.logger.error(error);
   }
 });

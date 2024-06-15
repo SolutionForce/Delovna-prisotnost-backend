@@ -66,7 +66,7 @@ router.get('/secrettotp', async (req, res) => {
   try {
     const admin = await EndpointSecurity.isUserAdmin(authHeader);
     if(!admin) {
-      res.status(401).send({error: "Unauthorized"});
+      res.status(401).send({message: "Unauthorized"});
       return;
     }
 
@@ -74,7 +74,7 @@ router.get('/secrettotp', async (req, res) => {
     res.json({ secretTOTP: secretTOTP });
   } catch (error) {
     logger.error(error);
-    res.status(500).send({error: "Cannot get secret TOTP key"});
+    res.status(500).send({message: "Cannot get secret TOTP key"});
   }
 });
 
@@ -84,7 +84,7 @@ router.put('/secrettotp', async (req, res) => {
   try {
     const admin = await EndpointSecurity.isUserAdmin(authHeader);
     if(!admin) {
-      res.status(401).send({error: "Unauthorized"});
+      res.status(401).send({message: "Unauthorized"});
       return;
     }
 
@@ -92,7 +92,7 @@ router.put('/secrettotp', async (req, res) => {
     res.status(200).json({ message: 'Succsessfuly generated new secret TOTP code for your organization' });
   } catch (error) {
     logger.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
@@ -103,7 +103,7 @@ router.get('/totp', async (req, res) => {
   try {
     const admin = await EndpointSecurity.isUserAdmin(authHeader);
     if(!admin) {
-      res.status(401).send({error: "Unauthorized"});
+      res.status(401).send({message: "Unauthorized"});
       return;
     }
 
@@ -112,7 +112,7 @@ router.get('/totp', async (req, res) => {
     res.json({ token });
   } catch (error) {
     logger.error(error);
-    res.status(500).send({error: "Cannot get TOTP code"});
+    res.status(500).send({message: "Cannot get TOTP code"});
   }
 });
 
@@ -122,7 +122,7 @@ router.post('/verify', async (req, res) => {
   try {
     const employeeOrBetter = await EndpointSecurity.isUserEmployeeOrBetter(authHeader);
     if(!employeeOrBetter) {
-      res.status(401).send({error: "Unauthorized"});
+      res.status(401).send({message: "Unauthorized"});
       return;
     }
 
@@ -138,7 +138,7 @@ router.post('/verify', async (req, res) => {
     res.status(200).json({ message: 'Token is valid' });
   } catch (error) {
     logger.error(error);
-    res.status(500).send({error: "Cannot verify TOTP code"});
+    res.status(500).send({message: "Cannot verify TOTP code"});
   }
 });
 

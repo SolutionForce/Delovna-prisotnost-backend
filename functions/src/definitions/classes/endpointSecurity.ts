@@ -4,6 +4,7 @@ import { Role, User } from "../interfaces/user";
 
 export abstract class EndpointSecurity {
   private static async getUserIdFromAuthHeader(authHeader: string | string[] | undefined): Promise<string | undefined> {
+    logger.debug(authHeader)
     try {
       if(typeof authHeader !== "string") {
         logger.warn("EndpointSecurity: Header 'auth' is not a string type");
