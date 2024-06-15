@@ -12,3 +12,4 @@ Vzpostavitev na Firebase strežniku:
 - cd Delovna-prisotnost-backend\functions
 - npm install
 - npm run deploy
+- API dostopen na "https://us-central1-rvir-1e34e.cloudfunctions.net/api/"
