@@ -1,6 +1,9 @@
 import express from "express";
 import { logger } from "firebase-functions";
-import { db } from "../config/firestoreConfig";
+import { auth, db } from "../config/firestoreConfig";
+import { User } from "../definitions/interfaces/user";
+import { UserManager } from "../definitions/classes/userManager";
+import { EndpointSecurity } from "../definitions/classes/endpointSecurity";
 import {getUsers} from "../common/users";
 import { get } from "http";
 const router = express.Router();
@@ -19,20 +22,29 @@ router.post("/users", async (req, res) => {
   logger.info(req.method + " " + req.originalUrl);
   logger.info("POST /users");
   try {
-    const user = req.body;
-    if (!user.uid || !user.name || !user.surname || !Array.isArray(user.attendance)) {
+    const authHeader = req.headers['auth'];
+    const admin = await EndpointSecurity.isUserAdmin(authHeader);
+    if(!admin) {
+      res.status(401).send({message: "Unauthorized"});
+      return;
+    }
+
+    const user: User = req.body;
+
+    // user.uid and user.createdAt not needed
+    if(!user.name || !user.surname || !user.email || user.email=='' || !user.organizationId || !user.role || !Array.isArray(user.attendance) || !user.hourlyRate)
+      return res.status(400).send("Invalid user data");
+
+    let createdUser: User;
+    try {
+      createdUser = await UserManager.registerUser(user);
+    } catch (error) {
       return res.status(400).send("Invalid user data");
     }
-    const newUser = {
-      uid: user.uid,
-      name: user.name,
-      surname: user.surname,
-      attendance: user.attendance
-    };
-    await db.collection('users').doc(newUser.uid).set(newUser);
-    res.status(201).send("User created");
+
+    res.status(201).send(createdUser);
   } catch (error) {
-    res.status(500).send(error);
+    res.status(500).json(error);
     logger.info("Error creating user:", error);
   }
 });
@@ -86,6 +98,13 @@ router.delete('/users/:uid', async (req, res) => {
   logger.info('DELETE /users/:uid');
 
   try {
+    const authHeader = req.headers['auth'];
+    const admin = await EndpointSecurity.isUserAdmin(authHeader);
+    if(!admin) {
+      res.status(401).send({message: "Unauthorized"});
+      return;
+    }
+
     const uid = req.params.uid;
     const userRef = db.collection('users').doc(uid);
     const userSnapshot = await userRef.get();
@@ -93,6 +112,9 @@ router.delete('/users/:uid', async (req, res) => {
     if (!userSnapshot.exists) {
       return res.status(404).send('User not found');
     }
+
+    // Delete the user from authentication
+    await auth.deleteUser(uid)
 
     // Delete the user document
     await userRef.delete();
