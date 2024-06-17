@@ -1,7 +1,7 @@
 [
-{"day":17,"month":6,"year":2024,"MorningShift":[{"name":"Janez","work":"7-11"},{"name":"Maja","work":"7-11"}],"AfternoonShift":[{"name":"Marko","work":"11-19"},{"name":"Igor","work":"11-19"}]},
-{"day":18,"month":6,"year":2024,"MorningShift":[{"name":"Katja","work":"7-11"},{"name":"Jakob","work":"7-11"}],"AfternoonShift":[{"name":"Marko","work":"11-19"},{"name":"Testing","work":"11-19"}]},
-{"day":19,"month":6,"year":2024,"MorningShift":[{"name":"Janez","work":"7-11"},{"name":"Igor","work":"7-11"}],"AfternoonShift":[{"name":"Maja","work":"11-19"},{"name":"Testing","work":"11-19"}]},
-{"day":20,"month":6,"year":2024,"MorningShift":[{"name":"Marko","work":"7-11"},{"name":"Katja","work":"7-11"}],"AfternoonShift":[{"name":"Jakob","work":"11-19"},{"name":"Testing","work":"11-19"}]},
-{"day":21,"month":6,"year":2024,"MorningShift":[{"name":"Janez","work":"7-11"},{"name":"Katja","work":"7-11"}],"AfternoonShift":[{"name":"Maja","work":"11-19"},{"name":"Jakob","work":"11-19"}]}
+{"day":17,"month":6,"year":2024,"MorningShift":[{"name":"Janez","work":"7-11","id":"0LDxbiOCX1YWLaHqesI7"},{"name":"Maja","work":"7-11","id":"HXJqPIFnnArd4XsTFjtn"}],"AfternoonShift":[{"name":"Marko","work":"11-19","id":"Jvg114TYF6MNqj9C5exZTGPd9Fg1"},{"name":"Katja","work":"11-19","id":"WsfuGD2jMdCSCAfOvLn0"}]},
+{"day":18,"month":6,"year":2024,"MorningShift":[{"name":"Marko","work":"7-11","id":"WANhbgdZozW7b48DPWP9"},{"name":"Igor","work":"7-11","id":"WtntIWe4iuRaUJEW3lq4"}],"AfternoonShift":[{"name":"Jakob","work":"11-19","id":"ebRi8pmxCgQzxRuJyPCx"},{"name":"Testing","work":"11-19","id":"ub3d023x4AfbOAP1VSqE5oA23fl2"}]},
+{"day":19,"month":6,"year":2024,"MorningShift":[{"name":"Janez","work":"7-11","id":"0LDxbiOCX1YWLaHqesI7"},{"name":"Marko","work":"7-11","id":"WANhbgdZozW7b48DPWP9"}],"AfternoonShift":[{"name":"Maja","work":"11-19","id":"HXJqPIFnnArd4XsTFjtn"},{"name":"Katja","work":"11-19","id":"WsfuGD2jMdCSCAfOvLn0"}]},
+{"day":20,"month":6,"year":2024,"MorningShift":[{"name":"Marko","work":"7-11","id":"Jvg114TYF6MNqj9C5exZTGPd9Fg1"},{"name":"Jakob","work":"7-11","id":"ebRi8pmxCgQzxRuJyPCx"}],"AfternoonShift":[{"name":"Igor","work":"11-19","id":"WtntIWe4iuRaUJEW3lq4"},{"name":"Testing","work":"11-19","id":"ub3d023x4AfbOAP1VSqE5oA23fl2"}]},
+{"day":21,"month":6,"year":2024,"MorningShift":[{"name":"Janez","work":"7-11","id":"0LDxbiOCX1YWLaHqesI7"},{"name":"Maja","work":"7-11","id":"HXJqPIFnnArd4XsTFjtn"}],"AfternoonShift":[{"name":"Marko","work":"11-19","id":"Jvg114TYF6MNqj9C5exZTGPd9Fg1"},{"name":"Katja","work":"11-19","id":"WsfuGD2jMdCSCAfOvLn0"}]}
 ]
