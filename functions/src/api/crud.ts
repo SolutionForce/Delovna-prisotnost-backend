@@ -164,5 +164,26 @@ router.delete('/users/:uid/attendance/:index', async (req, res) => {
   }
 });
 
+router.get("/timetables", async (req, res) => {
+  logger.info(req.method + " " + req.originalUrl);
+  logger.info("GET /timetable");
+
+  try {
+    const timetableCollection = await db.collection('timetables').get();
+    if (timetableCollection.empty) {
+      return res.status(404).send("No timetables found");
+    }
+
+    const timetables: any[] = [];
+    timetableCollection.forEach((doc) => {
+      timetables.push({ id: doc.id, ...doc.data() });
+    });
+
+    res.status(200).json(timetables);
+  } catch (error) {
+    res.status(500).send((error as Error).message);
+    logger.error("Error getting timetables:", error);
+  }
+});
 
 module.exports = router;
