@@ -4,7 +4,7 @@ import { auth, db } from "../config/firestoreConfig";
 import { User } from "../definitions/interfaces/user";
 import { UserManager } from "../definitions/classes/userManager";
 import { EndpointSecurity } from "../definitions/classes/endpointSecurity";
-import {getUsers} from "../common/users";
+import {getUsers} from "../definitions/classes/users";
 import { get } from "http";
 const router = express.Router();
 

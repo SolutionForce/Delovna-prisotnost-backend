@@ -1,6 +1,6 @@
 import express from "express";
 import { logger } from "firebase-functions";
-import { getUsers } from "../common/users";
+import { getUsers } from "../definitions/classes/users";
 import axios from "axios";
 import fs from "fs";
 import { db } from "../config/firestoreConfig";
@@ -47,7 +47,7 @@ const SaveToFirestore = async (jsonLAnswer: any) => {
 
 }
 
-router.get("/timetable", async (req, res) => {
+router.get("/timetable", async (req, res) => {  
   try {
     const fields = ["name", "uid"];
     const userResponse = await getUsers(fields);

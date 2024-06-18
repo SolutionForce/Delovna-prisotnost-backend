@@ -1,5 +1,5 @@
 // common/users.ts
-import { db } from "../config/firestoreConfig";
+import { db } from "../../config/firestoreConfig";
 import { Query } from '@google-cloud/firestore';
 
 interface User {

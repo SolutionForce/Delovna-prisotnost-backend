@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import axios from 'axios';
 import { logger } from 'firebase-functions';
-import { getUsers } from '../common/users';
+import { getUsers } from '../definitions/classes/users';
 import { db } from '../config/firestoreConfig';
 
 const date = new Date();
@@ -41,7 +41,7 @@ const SaveToFirestore = async (jsonLAnswer: any) => {
   await db.collection('timetables').add(newTimetable);
 };
 
-export const generateTimetable = functions.pubsub.schedule('every sunday 00:00').onRun(async (context) => {
+export const generateTimetable = functions.pubsub.schedule('every tuesday 16:00').onRun(async (context) => {
   try {
     const fields = ["name", "uid"];
     const userResponse = await getUsers(fields);
@@ -66,11 +66,12 @@ export const generateTimetable = functions.pubsub.schedule('every sunday 00:00')
 
     try {
       logger.warn("question", options.params.question)
+      //while loop probaj tu dodat da se naredi ponovno če ne zgenerira pravilno do 3x in potem vrne error
       const response = await axios.request(options);
       const jsonLAnswer: string = response.data.answer;
       if (!jsonLAnswer || jsonLAnswer.includes("I'm sorry") || jsonLAnswer.trim() === '') {
         throw new Error('API returned an error or empty response');
-        //tu spremeni da če ne zgenerira se narei once again 
+
       }
       await SaveToFirestore(jsonLAnswer);
       console.log("Timetable generated and saved successfully.");
