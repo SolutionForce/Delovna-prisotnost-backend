@@ -2,7 +2,7 @@ import express from "express";
 import { logger } from "firebase-functions";
 import { auth, db } from "../config/firestoreConfig";
 import { User } from "../definitions/interfaces/user";
-import { UserManager } from "../definitions/classes/userManager";
+import { UserManager, UserWithPassword } from "../definitions/classes/userManager";
 import { EndpointSecurity } from "../definitions/classes/endpointSecurity";
 import {getUsers} from "../definitions/classes/users";
 import { get } from "http";
@@ -29,13 +29,13 @@ router.post("/users", async (req, res) => {
       return;
     }
 
-    const user: User = req.body;
+    const user: UserWithPassword = req.body;
 
     // user.uid and user.createdAt not needed
-    if(!user.name || !user.surname || !user.email || user.email=='' || !user.organizationId || !user.role || !Array.isArray(user.attendance) || !user.hourlyRate)
+    if(!user.name || !user.surname || !user.email || user.email=='' || !user.password || user.password=='' || !user.organizationId || !user.role || !Array.isArray(user.attendance) || !user.hourlyRate)
       return res.status(400).send("Invalid user data");
 
-    let createdUser: User;
+    let createdUser: UserWithPassword;
     try {
       createdUser = await UserManager.registerUser(user);
     } catch (error) {

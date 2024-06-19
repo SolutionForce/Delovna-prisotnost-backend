@@ -1,8 +1,10 @@
-import { logger } from "firebase-functions/v1";
 import { auth, db } from "../../config/firestoreConfig";
 import { User } from "../interfaces/user";
 import { Timestamp } from "firebase-admin/firestore";
 
+export interface UserWithPassword extends User {
+  password: string;
+}
 
 export abstract class UserManager {
   static generateRandomPassword(): string {
@@ -20,12 +22,13 @@ export abstract class UserManager {
     return password;
   }
 
-  static async registerUser(user: User): Promise<User> {
+  
+  static async registerUser(user: UserWithPassword): Promise<UserWithPassword> {
     const registeredUser = await auth.createUser({
       email: user.email,
       emailVerified: false,
       phoneNumber: undefined,
-      password: this.generateRandomPassword(),
+      password: user.password,
       displayName: user.name + ' ' + user.surname,
       photoURL: undefined,
       disabled: false,
@@ -46,7 +49,7 @@ export abstract class UserManager {
     };
 
     await db.collection('users').doc(registeredUser.uid).set(firestoreUser);
-    return firestoreUser;
+    return {...firestoreUser, password: user.password};
   }
 
 }
