@@ -17,7 +17,7 @@ const app = express();
 app.use(express.json());
 
 // Define your endpoint directly in the test file or import it if defined elsewhere
-app.get('/timetable', async (req: any, res: any) => {
+app.get('/timetable', async (req, res) => {
   try {
     const usersResponse = await getUsers();
     if (usersResponse.status !== 200) {

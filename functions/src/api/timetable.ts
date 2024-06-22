@@ -2,7 +2,6 @@ import express from "express";
 import { logger } from "firebase-functions";
 import { getUsers } from "../definitions/classes/users";
 import axios from "axios";
-import fs from "fs";
 import { db } from "../config/firestoreConfig";
 
 const router = express.Router();
