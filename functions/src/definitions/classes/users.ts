@@ -1,12 +1,6 @@
-// common/users.ts
 import { db } from "../../config/firestoreConfig";
 import { Query } from '@google-cloud/firestore';
-
-interface User {
-  name?: string;
-  uid?: string;
-  [key: string]: any;
-}
+import { User } from "../interfaces/user"; // Ensure correct path to user interface
 
 interface ResponseData {
   data?: User[];
@@ -23,11 +17,22 @@ export const getUsers = async (fields: string[] | null = null): Promise<Response
     const snapshot = await query.get();
     const data = snapshot.docs.map(doc => {
       const docData = doc.data();
-      const user: User = {};
-      fields?.forEach(field => {
-        user[field] = docData[field];
-      });
-      return user;
+      const user: Partial<User> = {}; // Use Partial<User> to allow dynamic assignment
+
+      if (fields) {
+        fields.forEach(field => {
+          if (docData.hasOwnProperty(field)) {
+            (user as any)[field] = docData[field]; // Use 'as any' to allow dynamic property assignment
+          }
+        });
+      } else {
+        // If fields is null, include all fields from docData
+        Object.keys(docData).forEach(field => {
+          (user as any)[field] = docData[field]; // Use 'as any' to allow dynamic property assignment
+        });
+      }
+
+      return user as User; // Assert type back to User
     });
     return { data, status: 200 };
   } catch (error) {

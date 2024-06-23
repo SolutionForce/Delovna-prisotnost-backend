@@ -11,12 +11,16 @@ const router = express.Router();
 router.get("/users", async (req, res) => {
   logger.info(req.method + " " + req.originalUrl);
   logger.info("GET /users");
-  getUsers().then((response) => {
+  try {
+    const response = await getUsers();
     console.log(response);
     res.status(response.status).json(response.data);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-  );
 });
+
 
 router.post("/users", async (req, res) => {
   logger.info(req.method + " " + req.originalUrl);
