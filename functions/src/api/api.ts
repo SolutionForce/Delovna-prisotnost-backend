@@ -11,11 +11,13 @@ app.use(cors({origin: true, credentials: true})); //Zacasno omogocimo CORS v lok
 
 //Import your files
 const crud = require("./crud"); 
-const codeAuthentication  = require("./routes/codeAuthentication "); 
 const timetable = require("./timetable");
+const organizations = require("./routes/organizations");
+const codeAuthentication  = require("./routes/codeAuthentication "); 
 
-app.use("/", timetable);
 app.use("/", crud);
+app.use("/", timetable);
+app.use("/organizations", organizations);
 app.use("/codeAuthentication", codeAuthentication);
 
 
