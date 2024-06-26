@@ -1,8 +1,5 @@
-const { onRequest } = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
-const functions = require("firebase-functions");
-const express = require("express");
-const cors = require('cors');
+import express from "express";
+import cors from 'cors';
 
 const app = express();
 
@@ -14,11 +11,13 @@ const crud = require("./crud");
 const timetable = require("./timetable");
 const organizations = require("./routes/organizations");
 const codeAuthentication  = require("./routes/codeAuthentication "); 
+const emails  = require("./routes/emails"); 
 
 app.use("/", crud);
 app.use("/", timetable);
 app.use("/organizations", organizations);
 app.use("/codeAuthentication", codeAuthentication);
+app.use("/emails", emails);
 
 
 export { app };
