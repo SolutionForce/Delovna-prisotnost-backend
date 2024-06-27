@@ -30,7 +30,7 @@ export abstract class EndpointSecurity {
     }
   }
 
-  private static async getUserData(userId: string): Promise<User | undefined> {
+  static async getUserData(userId: string): Promise<User | undefined> {
     const userDoc = await db.collection('users').doc(userId).get();
       const userData = userDoc.data();
       if(!userData) {
