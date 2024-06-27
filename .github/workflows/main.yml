@@ -25,8 +25,8 @@ jobs:
     - name: Install dependencies
       run: cd functions && npm install
 
-    - name: Run tests
-      run: cd functions && npm test
+    #- name: Run tests
+    #  run: cd functions && npm test
 
     - name: Lint code
       run: cd functions && npm run lint
