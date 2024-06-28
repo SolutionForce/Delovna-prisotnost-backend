@@ -21,12 +21,6 @@ async function createNewSecretKey(organizationId: string): Promise<string> {
   if(!organizationData)
     throw new Error('Organization document with id "' + organizationId + '" not found');
 
-  const organization: OrganizationWithId = {
-    id: doc.id,
-    name: organizationData.name,
-    secretTOTP: organizationData.secretTOTP
-  }
-
   const newSecretTOTP = authenticator.generateSecret();
   const encryptedNewSecretTOTP = encrypt(newSecretTOTP)
   await db.collection("organizations").doc(organizationId).update({secretTOTP: encryptedNewSecretTOTP})
@@ -64,7 +58,7 @@ function createTOTPCode(secret: string) {
 router.get('/secrettotp', async (req, res) => {
   const authHeader = req.headers['auth'];
   try {
-    const admin = await EndpointSecurity.isUserAdmin(authHeader);
+    const admin = await EndpointSecurity.isUserReceptionistOrBetter(authHeader);
     if(!admin) {
       res.status(401).send({message: "Unauthorized"});
       return;
@@ -101,7 +95,7 @@ router.put('/secrettotp', async (req, res) => {
 router.get('/totp', async (req, res) => {
   const authHeader = req.headers['auth'];
   try {
-    const admin = await EndpointSecurity.isUserAdmin(authHeader);
+    const admin = await EndpointSecurity.isUserReceptionistOrBetter(authHeader);
     if(!admin) {
       res.status(401).send({message: "Unauthorized"});
       return;

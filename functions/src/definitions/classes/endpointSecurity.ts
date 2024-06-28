@@ -76,7 +76,7 @@ export abstract class EndpointSecurity {
       if(!user)
         return undefined;
   
-      if(user.role!==Role.guest && user.role!==Role.employee && user.role!==Role.admin) {
+      if(user.role!==Role.guest && user.role!==Role.employee && user.role!==Role.receptionist && user.role!==Role.admin) {
         return undefined;
       }
   
@@ -96,12 +96,31 @@ export abstract class EndpointSecurity {
       const user = await this.getUserData(userId);
       if(!user)
         return undefined;
+
+      if(user.role===Role.employee || user.role===Role.receptionist || user.role===Role.admin)
+        return user;
   
-      if(user.role!==Role.employee && user.role!==Role.admin) {
+      return undefined;
+    } catch(error) {
+      logger.error(error);
+      return undefined;
+    }
+  }
+
+  static async isUserReceptionistOrBetter(authHeader: string | string[] | undefined): Promise<User | undefined> {
+    try {
+      const userId = await this.getUserIdFromAuthHeader(authHeader);
+      if(!userId)
         return undefined;
-      }
+
+      const user = await this.getUserData(userId);
+      if(!user)
+        return undefined;
+
+      if(user.role===Role.receptionist || user.role===Role.admin)
+        return user;
   
-      return user;
+      return undefined;
     } catch(error) {
       logger.error(error);
       return undefined;
