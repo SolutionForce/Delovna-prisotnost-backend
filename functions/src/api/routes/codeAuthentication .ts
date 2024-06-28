@@ -81,9 +81,10 @@ router.get('/secrettotp', async (req, res) => {
 //Generates new secrettotp for organization
 router.put('/secrettotp', async (req, res) => {
   const authHeader = req.headers['auth'];
+  console.log(authHeader)
   try {
     const admin = await EndpointSecurity.isUserAdmin(authHeader);
-    if(!admin) {
+    if(!admin ) {
       res.status(401).send({message: "Unauthorized"});
       return;
     }
