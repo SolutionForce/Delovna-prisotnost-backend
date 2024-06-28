@@ -29,7 +29,7 @@ app.get('/timetable', async (req, res) => {
       url: 'https://chat-gpt-43.p.rapidapi.com/',
       params: { question: 'your question' },
       headers: {
-        'X-RapidAPI-Key': '4c18557083msh649943c48ac5cb5p182612jsnc5a2eb1ac508',
+        'X-RapidAPI-Key': process.env.RAPIDAPI_API_KEY,
         'X-RapidAPI-Host': 'chat-gpt-43.p.rapidapi.com',
       },
     };
