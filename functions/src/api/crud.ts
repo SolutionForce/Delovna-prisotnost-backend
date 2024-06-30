@@ -1,11 +1,9 @@
 import express from "express";
 import { logger } from "firebase-functions";
 import { auth, db } from "../config/firestoreConfig";
-import { User } from "../definitions/interfaces/user";
 import { UserManager, UserWithPassword } from "../definitions/classes/userManager";
 import { EndpointSecurity } from "../definitions/classes/endpointSecurity";
 import {getUsers} from "../definitions/classes/users";
-import { get } from "http";
 const router = express.Router();
 
 router.get("/users", async (req, res) => {
@@ -35,7 +33,6 @@ router.post("/users", async (req, res) => {
 
     const user: UserWithPassword = req.body;
 
-    // user.uid and user.createdAt not needed
     if(!user.name || !user.surname || !user.email || user.email=='' || !user.password || user.password=='' || !user.organizationId || !user.role || !Array.isArray(user.attendance) || !user.hourlyRate)
       return res.status(400).send("Invalid user data");
 
@@ -82,7 +79,6 @@ router.patch('/users/:uid', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    // Update user data with the new fields provided in the request body
     const updatedData = req.body;
     await userRef.update(updatedData);
 
@@ -117,10 +113,8 @@ router.delete('/users/:uid', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-    // Delete the user from authentication
     await auth.deleteUser(uid)
 
-    // Delete the user document
     await userRef.delete();
 
     res.status(200).send('User deleted successfully');
@@ -145,19 +139,16 @@ router.delete('/users/:uid/attendance/:index', async (req, res) => {
     }
 
     const userData = userSnapshot.data();
-    const attendance = userData?.attendance; // Add null check for userData
+    const attendance = userData?.attendance;
 
     if (index < 0 || index >= attendance.length) {
       return res.status(400).send('Invalid attendance index');
     }
 
-    // Remove the specific attendance entry
     attendance.splice(index, 1);
 
-    // Update the user document with the modified attendance array
     await userRef.update({ attendance });
 
-    // Fetch the updated user data to return in the response
     const updatedUserSnapshot = await userRef.get();
     const updatedUserData = updatedUserSnapshot.data();
 

@@ -1,0 +1,41 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      run: cd functions && npm install
+
+    #- name: Run tests
+    #  run: cd functions && npm test
+
+    #- name: Lint code
+    #  run: cd functions && npm run lint
+
+    - name: Check TypeScript types
+      run: cd functions && npx tsc --noEmit
+
+    # Uncomment the following lines to enable deployment to Firebase
+    # - name: Deploy to Firebase
+    #   env:
+    #     FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+    #   run: cd functions && npm run deploy

@@ -12,6 +12,8 @@ module.exports = {
   ],
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.
+    "**/*.test.js", // Ignore test files with .test.js extension
+    "**/*.test.ts", // Ignore test files with .test.ts extension
   ],
   rules: {
     "no-restricted-globals": ["error", "name", "length"],

@@ -2,7 +2,6 @@ import express from "express";
 import { logger } from "firebase-functions";
 import { getUsers } from "../definitions/classes/users";
 import axios from "axios";
-import fs from "fs";
 import { db } from "../config/firestoreConfig";
 
 const router = express.Router();
@@ -113,9 +112,7 @@ router.get("/timetable", async (req, res) => {
         params: {question: `This job is Create the new timetable for users [${userList}].Data should be created for the next week, starting from ${newStart} until ${otherDate}  Exclude the weekends. The minimum shift time should be 4 hours. Users need to get at least 36 hours a week work scheduled therefore as many as needed can be scheduled for any shift. At least two people need to work the same shift daily. Same worker can't work 2 shifts in a day and no more than 9 hours. The business opens at 7 and closes at 23. The business is closed on sundays. Provide data for the next 7 days. Here's the example format in which data should be returned: {"day":15,"month":6,"year":2024,"MorningShift":[{"name":"Janez","work":"8-12", uid="xy"},{"name":"Testni","work":"7-15", uid="xafdsy"}],"AfternoonShift":[{"name":"Maja","work":"12-20", uid="xyasd"},{"name":"Testni","work":"15-21", uid="jbg"}]}{"day":16,"month":6,"year":2024,"MorningShift":[{"name":"Jakob","work":"8-16",uid="xy"},{"name":"Igor","work":"8-16", uid="wetf"}],"AfternoonShift":[{"name":"Testni","work":"13-21", uid="sdy"},{"name":"Maja","work":"13-21", uid="wrfsdf"}]} ONLY RETURN THE JSON AS A RESPONSE, use corresponding uid. DO NOT RETURN ANYTHING ELSE. USE THE USERS I PROVIDED. The structure should be the same as in the example and format of return should be JSON string meaning the response starts with a '[', the correct one. Do not forget the outermost brackets [] and the commas between each entry. Provide the smart schedule for the next 5 days. Do not generate it only for 1 day. Seriuosly, do not return anything else. You've done it before, do it again`
     },
         headers: {
-        //'x-rapidapi-key': 'c2d191dce4msh7f530aafe69c7a0p1d2f73jsn91c7a42e7f2c',
-        //'x-rapidapi-key': '4c18557083msh649943c48ac5cb5p182612jsnc5a2eb1ac508', //switch those due to limit
-        'x-rapidapi-key': '64c430afa5msha16949e00446eb7p1c91c6jsnd88aea0281d4',
+        'x-rapidapi-key': process.env.RAPIDAPI_API_KEY,
         'x-rapidapi-host': 'chat-gpt-43.p.rapidapi.com'
 
         }
