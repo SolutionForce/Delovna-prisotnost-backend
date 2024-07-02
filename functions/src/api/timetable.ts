@@ -1,166 +1,118 @@
-import express from "express";
-import { logger } from "firebase-functions";
-import { getUsers } from "../definitions/classes/users";
-import axios from "axios";
-import { db } from "../config/firestoreConfig";
+const request = require('supertest');
+import express from 'express';
+import nock from 'nock';
+import axios from 'axios';
+import { getUsers } from '../definitions/classes/users'; // Adjust the path accordingly
+import { User } from '../definitions/interfaces/user';
 
-const router = express.Router();
-const date = new Date();
-const day = date.getDate();
-const month = date.getMonth() + 1;
-const year = date.getFullYear();
-const currentWeek = date.getDay();
-const currentDate = `${day}/${month}/${year}`;
+jest.mock('axios');
+jest.mock('../definitions/classes/users');
 
-interface Shift {
-    name: string;
-    work: string;
-}
-const addDays = (date: any, days: any) => {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-};
+const app = express();
+app.use(express.json());
 
-const formatDate = (date: any) => {
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  console.log("date", date, day, month, year);
-  return `${day}/${month}/${year}`;
-};
-
-const SaveToFirestore = async (jsonLAnswer: any, starting_date: any) => {
-  console.log(starting_date);
-
-  // Convert start_date to a Date object if it's not already
-  const startDate = new Date(starting_date);
-
-  // Calculate new end_date by adding 7 days to start_date
-  const endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 5);
-
-  // Calculate new start_date by adding 1 day to endDate
-  const newStartDate = new Date(startDate);
-  //newStartDate.setDate(startDate.getDate() + 1);
-
-  console.log('Start Date:', newStartDate);
-  console.log('End Date:', endDate);
-
-  const newTimetable = {
-      start_date: newStartDate,
-      end_date: endDate,
-      attendance: jsonLAnswer
-  };
-
-  await db.collection('timetables').add(newTimetable);
-
-}
-
-const getLastTimetable = async () => {
-  const timetableResponse = await db.collection('timetables')
-  .orderBy('end_date', 'desc')
-  .limit(1)
-  .get();
-  let endDate = null;
-
-    if (!timetableResponse.empty) {
-        const timetable = timetableResponse.docs[0];
-        const endDateTimestamp = timetable.data().end_date;
-        //console.log('End Date Timestamp:', endDateTimestamp);
-
-        endDate = endDateTimestamp.toDate();
-        console.log('End Date:', endDate);
-    } else {
-        console.log('No timetables found');
-        // Set endDate to current date or handle as needed
-        endDate = new Date(); // Example: setting endDate to current date
-    }
-
-    return endDate;
-}
-
-router.get("/timetable", async (req, res) => {  
+// Define your endpoint directly in the test file or import it if defined elsewhere
+app.get('/timetable', async (req, res) => {
   try {
-    const fields = ["name", "uid"];
-    const userResponse = await getUsers(fields);
-    if (userResponse.status !== 200) {
-      return res.status(userResponse.status).json(userResponse.error);
+    const usersResponse = await getUsers();
+    if (usersResponse.status !== 200) {
+      throw new Error('Failed to fetch users');
     }
-    console.log(userResponse.data);
-    
-    const users = userResponse.data;
-    const userList = users ? users.map(user => `{"name": "${user.name}", "uid": "${user.uid}"}`).join(", ") : "";
-    const newStart = await getLastTimetable();
-
-    console.log("------------------------------------");
-    console.log("newStart", newStart);
-    //increase end date by 1
-    newStart.setDate(newStart.getDate());
-    console.log("newStart + 1 ", newStart);
-    
-    const endDate = newStart;
-    const otherDate = addDays(newStart, 5);
-
-    console.log("------------------------------------");
-    
-
 
     const options = {
-        method: 'GET',
-        url: 'https://chat-gpt-43.p.rapidapi.com/',
-        params: {question: `This job is Create the new timetable for users [${userList}].Data should be created for the next week, starting from ${newStart} until ${otherDate}  Exclude the weekends. The minimum shift time should be 4 hours. Users need to get at least 36 hours a week work scheduled therefore as many as needed can be scheduled for any shift. At least two people need to work the same shift daily. Same worker can't work 2 shifts in a day and no more than 9 hours. The business opens at 7 and closes at 23. The business is closed on sundays. Provide data for the next 7 days. Here's the example format in which data should be returned: {"day":15,"month":6,"year":2024,"MorningShift":[{"name":"Janez","work":"8-12", uid="xy"},{"name":"Testni","work":"7-15", uid="xafdsy"}],"AfternoonShift":[{"name":"Maja","work":"12-20", uid="xyasd"},{"name":"Testni","work":"15-21", uid="jbg"}]}{"day":16,"month":6,"year":2024,"MorningShift":[{"name":"Jakob","work":"8-16",uid="xy"},{"name":"Igor","work":"8-16", uid="wetf"}],"AfternoonShift":[{"name":"Testni","work":"13-21", uid="sdy"},{"name":"Maja","work":"13-21", uid="wrfsdf"}]} ONLY RETURN THE JSON AS A RESPONSE, use corresponding uid. DO NOT RETURN ANYTHING ELSE. USE THE USERS I PROVIDED. The structure should be the same as in the example and format of return should be JSON string meaning the response starts with a '[', the correct one. Do not forget the outermost brackets [] and the commas between each entry. Provide the smart schedule for the next 5 days. Do not generate it only for 1 day. Seriuosly, do not return anything else. You've done it before, do it again`
-    },
-        headers: {
-        'x-rapidapi-key': process.env.RAPIDAPI_API_KEY,
-        'x-rapidapi-host': 'chat-gpt-43.p.rapidapi.com'
-
-        }
+      method: 'GET',
+      url: 'https://chat-gpt-43.p.rapidapi.com/',
+      params: { question: 'your question' },
+      headers: {
+        'X-RapidAPI-Key': process.env.RAPIDAPI_API_KEY,
+        'X-RapidAPI-Host': 'chat-gpt-43.p.rapidapi.com',
+      },
     };
 
-    try {
-      logger.warn("question", options.params.question);
-      let response;
-      let jsonLAnswer;
-      let retries = 3;
-      let success = false;
-  
-      for (let attempt = 0; attempt < retries; attempt++) {
-          try {
-              response = await axios.request(options);
-              jsonLAnswer = response.data.answer;
-  
-              console.log("adi di dad didid a", jsonLAnswer);
-  
-              if (!jsonLAnswer || jsonLAnswer.includes("I'm sorry") || jsonLAnswer.trim() === '') {
-                  throw new Error('API returned an error or empty response');
-              }
-  
-              success = true;
-              break;
-          } catch (error: any) {
-              console.error(`Attempt ${attempt + 1} failed: ${error.message}`);
-              if (attempt === retries - 1) {
-                  throw new Error('All retry attempts failed');
-              }
-          }
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const response = await axios.request(options);
+        const jsonLAnswer = response.data.answer;
+        if (!jsonLAnswer || jsonLAnswer.includes("I'm sorry") || jsonLAnswer.trim() === '') {
+          throw new Error('API returned an error or empty response');
+        }
+        // SaveToFirestore(jsonLAnswer, endDate); // Mock this if needed
+        return res.status(200).json(JSON.parse(jsonLAnswer));
+      } catch (error) {
+        if (attempt === 2) {
+          throw error;
+        }
       }
-  
-      if (success) {
-          await SaveToFirestore(jsonLAnswer, endDate);
-          res.status(200).json(jsonLAnswer);
-      } else {
-          res.status(500).send("An error occurred after multiple retries");
-      }
+    }
   } catch (error) {
-      console.error(error);
-      res.status(500).send("An error occurred");
-  }
-  
-  } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).send("An error occurred");
   }
 });
 
-module.exports = router;
+describe('GET /timetable', () => {
+  afterEach(() => {
+    nock.cleanAll();
+    jest.clearAllMocks();
+  });
+
+  it('should return a successful response with mocked data', async () => {
+    const mockUsers: User[] = [
+      { name: 'John Doe', uid: '1', surname: 'Doe', email: 'john@example.com', createdAt: new Date(), organizationId: 'org1', /* add other required properties */ },
+      { name: 'Jane Smith', uid: '2', surname: 'Smith', email: 'jane@example.com', createdAt: new Date(), organizationId: 'org2', /* add other required properties */ },
+      { name: 'Marko Jovanovic', uid: '3', surname: 'Jovanovic', email: 'marko@example.com', createdAt: new Date(), organizationId: 'org3', /* add other required properties */ },
+    ];
+
+    const mockApiResponse = `[ {"day":17,"month":6,"year":2024,"MorningShift":[{"name":"Monika","work":"7-11","uid":"VJiNzZKySdh4HR5mG3OGrPPkDYB3"},{"name":"Marko","work":"7-11","uid":"WANhbgdZozW7b48DPWP9"}],"AfternoonShift":[{"name":"Igor","work":"11-19","uid":"WtntIWe4iuRaUJEW3lq4"},{"name":"Janez","work":"11-19","uid":"0LDxbiOCX1YWLaHqesI7"}]}, {"day":18,"month":6,"year":2024,"MorningShift":[{"name":"Jakob","work":"7-11","uid":"ebRi8pmxCgQzxRuJyPCx"},{"name":"Katja","work":"7-11","uid":"WsfuGD2jMdCSCAfOvLn0"}],"AfternoonShift":[{"name":"Maja","work":"11-19","uid":"HXJqPIFnnArd4XsTFjtn"},{"name":"Monika","work":"11-19","uid":"VJiNzZKySdh4HR5mG3OGrPPkDYB3"}]}, {"day":19,"month":6,"year":2024,"MorningShift":[{"name":"Igor","work":"7-11","uid":"WtntIWe4iuRaUJEW3lq4"},{"name":"Marko","work":"7-11","uid":"WANhbgdZozW7b48DPWP9"}],"AfternoonShift":[{"name":"Janez","work":"11-19","uid":"0LDxbiOCX1YWLaHqesI7"},{"name":"Jakob","work":"11-19","uid":"ebRi8pmxCgQzxRuJyPCx"}]}, {"day":20,"month":6,"year":2024,"MorningShift":[{"name":"Katja","work":"7-11","uid":"WsfuGD2jMdCSCAfOvLn0"},{"name":"Maja","work":"7-11","uid":"HXJqPIFnnArd4XsTFjtn"}],"AfternoonShift":[{"name":"Monika","work":"11-19","uid":"VJiNzZKySdh4HR5mG3OGrPPkDYB3"},{"name":"Igor","work":"11-19","uid":"WtntIWe4iuRaUJEW3lq4"}]}, {"day":21,"month":6,"year":2024,"MorningShift":[{"name":"Marko","work":"7-11","uid":"WANhbgdZozW7b48DPWP9"},{"name":"Janez","work":"7-11","uid":"0LDxbiOCX1YWLaHqesI7"}],"AfternoonShift":[{"name":"Jakob","work":"11-19","uid":"ebRi8pmxCgQzxRuJyPCx"},{"name":"Katja","work":"11-19","uid":"WsfuGD2jMdCSCAfOvLn0"}]} ]`;
+
+    // Mock the external API request
+    nock('https://chat-gpt-43.p.rapidapi.com')
+      .get('/')
+      .query(true)
+      .reply(200, { answer: mockApiResponse });
+
+    // Mock the getUsers function to avoid hitting the actual service
+    (getUsers as jest.MockedFunction<typeof getUsers>).mockResolvedValue({
+      status: 200,
+      data: mockUsers,
+    });
+
+    const res = await request(app).get('/timetable');
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(JSON.parse(mockApiResponse));
+  });
+
+  it('should return a 500 error if the API response is invalid', async () => {
+    // Mock the external API request to return an invalid response
+    nock('https://chat-gpt-43.p.rapidapi.com')
+      .get('/')
+      .query(true)
+      .reply(200, { answer: '' });
+
+    // Mock the getUsers function to avoid hitting the actual service
+    (getUsers as jest.MockedFunction<typeof getUsers>).mockResolvedValue({
+      status: 200,
+      data: [],
+    });
+
+    const res = await request(app).get('/timetable');
+
+    expect(res.status).toBe(500);
+  });
+
+  it('should return a 500 error if the external API returns an error', async () => {
+    // Mock the external API request to return an error
+    nock('https://chat-gpt-43.p.rapidapi.com').get('/').reply(500);
+
+    // Mock the getUsers function to avoid hitting the actual service
+    (getUsers as jest.MockedFunction<typeof getUsers>).mockResolvedValue({
+      status: 200,
+      data: [],
+    });
+
+    const res = await request(app).get('/timetable');
+
+    expect(res.status).toBe(500);
+  });
+});
