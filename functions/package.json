@@ -10,7 +10,8 @@
     "start": "concurrently \"npm run serve\" \"npm run watch\"",
     "deploy": "npm run build && firebase deploy --only functions",
     "shell": "firebase functions:shell",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "test": "jest"
   },
   "engines": {
     "node": "20"
