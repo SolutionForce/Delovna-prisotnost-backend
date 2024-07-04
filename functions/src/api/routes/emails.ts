@@ -76,7 +76,7 @@ router.post('/', async (req, res) => {
         }));
    
     const emailManager = new EmailManager();
-    const success = await emailManager.sendEmail(emailData.recipientUserId, emailData.subject, emailData.message, attachments);
+    const success = await emailManager.sendEmailByUserId(emailData.recipientUserId, emailData.subject, emailData.message, attachments);
 
     if(!success){
       res.status(400).json({message: "Incorrect data"});

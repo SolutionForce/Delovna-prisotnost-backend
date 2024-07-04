@@ -4,6 +4,8 @@ import { auth, db } from "../config/firestoreConfig";
 import { UserManager, UserWithPassword } from "../definitions/classes/userManager";
 import { EndpointSecurity } from "../definitions/classes/endpointSecurity";
 import {getUsers} from "../definitions/classes/users";
+import { EmailSend } from "./routes/emails";
+import { EmailManager } from "../definitions/classes/emailManager";
 const router = express.Router();
 
 router.get("/users", async (req, res) => {
@@ -156,6 +158,52 @@ router.delete('/users/:uid/attendance/:index', async (req, res) => {
   } catch (error) {
     logger.error('Error deleting attendance:', error);
     res.status(500).send('Internal server error');
+  }
+});
+
+router.post("/users/resetPassword", async (req, res) => {
+  try {
+    const email = req.body.email;
+    if(!email) {
+      res.status(400).send({message: "Missing 'email' field"});
+      return;
+    }
+
+    let resetPasswordLink = "";
+    try {
+      resetPasswordLink = await auth.generatePasswordResetLink(email);
+    } catch (error) {
+      res.status(400).send({message: "Password reset link could not be sent"});
+      return;
+    }
+
+    if(resetPasswordLink==="") {
+      res.status(400).send({message: "Password reset link could not be sent"});
+      return;
+    }
+
+    const emailData: EmailSend = {
+      recipientUserId: email,
+      subject: "Password reset - Solution force",
+      message: `Hello.
+      
+      You can reset your password for Solution force on the following link: ${resetPasswordLink}.
+      
+      If you did not request a password reset, you can ignore this email.`
+    };
+   
+    const emailManager = new EmailManager();
+    const success = await emailManager.sendEmail(emailData.recipientUserId, emailData.subject, emailData.message);
+
+    if(!success){
+      res.status(400).send({message: "Password reset link could not be sent over email"});
+      return;
+    }
+
+    res.status(200).send({message: "Password reset link sent"});
+  } catch (error) {
+    res.status(500).json({message: "Password reset link could not be sent"});
+    logger.info("Error: Password reset link could not be sent: ", error);
   }
 });
 
